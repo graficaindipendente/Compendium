@@ -109,17 +109,20 @@ hr {
     }
           
         .menu {
-            display: flex;
+      display: flex;
+      justify-content: center;
             background-color: #333;
             padding: 0;
             margin: 0;
+            flex-wrap: wrap;
         }
     
         .menu-item {
             list-style: none;
-            padding: 14px 20px;
-            color: white;
-            cursor: pointer;
+                padding: 14px 20px;
+                color: white;
+                cursor: pointer;
+                text-align: center;
         }
     
         .menu-item:hover {
@@ -128,10 +131,23 @@ hr {
     
         .content {
             display: none;
-            padding: 20px;
-            font-size: 18px;
+                padding: 20px;
+                font-size: 18px;
+                text-align: center;
         }
     
         .active {
             display: block;
         }
+
+                @media (max-width: 768px) {
+                    .menu {
+                        flex-direction: column;
+                        align-items: center;
+                    }
+        
+                    .menu-item {
+                        width: 100%;
+                        padding: 20px;
+                        font-size: 20px;
+                        border-bottom: 1px solid #444;
