@@ -108,3 +108,30 @@ hr {
     background-image: linear-gradient(to right, #666666, #fff); /* Imposta il gradiente sfumato, da nero (#000) a bianco (#fff) */
     }
           
+        .menu {
+            display: flex;
+            background-color: #333;
+            padding: 0;
+            margin: 0;
+        }
+    
+        .menu-item {
+            list-style: none;
+            padding: 14px 20px;
+            color: white;
+            cursor: pointer;
+        }
+    
+        .menu-item:hover {
+            background-color: #555;
+        }
+    
+        .content {
+            display: none;
+            padding: 20px;
+            font-size: 18px;
+        }
+    
+        .active {
+            display: block;
+        }
