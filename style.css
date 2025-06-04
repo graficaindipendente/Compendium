@@ -27,12 +27,17 @@ img {
     box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
     }
 
-        .anime {
-            width: 200px;
-                height: 300px;
-            border-radius: 15px;
-            box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);   }
+.anime {
+    width: 200px;
+    height: 300px;
+    border-radius: 15px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);   }
 
+.pcgame {
+    width: 300px;
+    height: 200px;
+    border-radius: 15px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);   }
 
 .thumbnail {
     width: 200px;
@@ -41,12 +46,20 @@ img {
     font-size: 10px;
     text-align: center;
     }
-        .cover {
-            width: 200px;
-            height: 350px;
-            margin: 10px;
-            font-size: 10px;
-            text-align: center;   }
+.cover {
+    width: 200px;
+    height: 350px;
+    margin: 10px;
+    font-size: 10px;
+    text-align: center;   }
+
+.pcicon {
+    width: 350px;
+    height: 200px;
+    margin: 30px;
+    margin-bottom: 50px;
+    font-size: 10px;
+    text-align: center;   }
 
 .caption {
     margin-top: 5px;
