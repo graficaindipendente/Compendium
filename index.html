@@ -56,28 +56,100 @@
             color: #313131;
         }
 
-        .extra-images {
-            margin-top: 10px;
+        /* Modale carosello */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
         }
 
-        .extra-images img {
-            width: 250px;
-            height: 100px;
-            object-fit: cover;
-            margin-right: 5px;
+        .modal-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .modal-content img {
+            max-width: 80%;
+            max-height: 80%;
+            display: block;
+            margin: auto;
+        }
+
+        .close,
+        .prev,
+        .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: white;
+            font-size: 2em;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .close {
+            top: 20px;
+            right: 30px;
+            font-size: 2em;
+            transform: none;
+        }
+
+        .prev {
+            left: 10px;
+        }
+
+        .next {
+            right: 10px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- <h1>Nintendo Switch</h1> -->
     <div class="grid" id="card-container"></div>
 
-    <!-- PapaParse per leggere il CSV -->
+    <!-- Modale Carosello -->
+    <div class="modal" id="imageModal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <span class="prev" onclick="changeSlide(-1)">&#10094;</span>
+        <div class="modal-content">
+            <img id="modalImage" src="" alt="">
+        </div>
+        <span class="next" onclick="changeSlide(1)">&#10095;</span>
+    </div>
+
+    <!-- PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRqhkY2nqdQ5OMhYSfOLZWk7YYNiB0v3vJQxuSTL3udiKhrsLhQzgJ2LNkI4RuG7-3no8QtUx2_O2l-/pub?output=csv';
+
+        let currentImages = [];
+        let currentIndex = 0;
+
+        function openModal(images, index) {
+            currentImages = images;
+            currentIndex = index;
+            document.getElementById('modalImage').src = currentImages[currentIndex];
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        function changeSlide(direction) {
+            if (currentImages.length === 0) return;
+            currentIndex = (currentIndex + direction + currentImages.length) % currentImages.length;
+            document.getElementById('modalImage').src = currentImages[currentIndex];
+        }
 
         Papa.parse(csvUrl, {
             download: true,
@@ -105,38 +177,34 @@
                     const title2 = document.createElement('h3');
                     title2.textContent = item['Edizione'] || '';
 
-
                     const desc = document.createElement('p');
                     desc.textContent = item['Descrizione'] || '';
 
-                    const extraContainer = document.createElement('div');
-                    extraContainer.className = 'extra-images';
-                    extraContainer.style.display = 'none';
-
+                    // Raccolta immagini per il carosello
+                    const images = [];
                     ['Foto 2', 'Foto 3', 'Foto 4'].forEach(f => {
-                        if (item[f]) {
-                            const extraImg = document.createElement('img');
-                            extraImg.src = item[f];
-                            extraImg.alt = f;
-                            extraContainer.appendChild(extraImg);
-                        }
+                        if (item[f]) images.push(item[f]);
                     });
 
                     img.addEventListener('click', () => {
-                        extraContainer.style.display = extraContainer.style.display === 'none' ? 'block' : 'none';
+                        openModal(images, 0); // Mostra carosello partendo dalla prima immagine
                     });
+
                     content.appendChild(subtitle);
                     content.appendChild(title);
                     content.appendChild(title2);
                     content.appendChild(desc);
-                    content.appendChild(extraContainer);
 
                     card.appendChild(img);
                     card.appendChild(content);
-
                     container.appendChild(card);
                 });
             }
+        });
+
+        // Chiudi modale con ESC
+        window.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') closeModal();
         });
     </script>
 
