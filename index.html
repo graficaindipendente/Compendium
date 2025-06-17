@@ -4,12 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nintendo Switch</title>
+    <title>Compendium</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             padding: 20px;
             background: #f4f4f4;
+        }
+
+        .filter-buttons {
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons button {
+            margin: 5px 5px 5px 0;
+            padding: 8px 12px;
+            font-size: 14px;
+            border: none;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .filter-buttons button.active {
+            background-color: #7700ff;
+            color: white;
         }
 
         .grid {
@@ -56,7 +75,6 @@
             color: #313131;
         }
 
-        /* Modale carosello */
         .modal {
             display: none;
             position: fixed;
@@ -114,9 +132,13 @@
 
 <body>
 
+    <!-- ✅ Bottoni filtro dinamici -->
+    <div class="filter-buttons" id="filterButtons"></div>
+
+    <!-- Contenitore carte -->
     <div class="grid" id="card-container"></div>
 
-    <!-- Modale Carosello -->
+    <!-- Modale immagini -->
     <div class="modal" id="imageModal">
         <span class="close" onclick="closeModal()">&times;</span>
         <span class="prev" onclick="changeSlide(-1)">&#10094;</span>
@@ -126,11 +148,10 @@
         <span class="next" onclick="changeSlide(1)">&#10095;</span>
     </div>
 
-    <!-- PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRqhkY2nqdQ5OMhYSfOLZWk7YYNiB0v3vJQxuSTL3udiKhrsLhQzgJ2LNkI4RuG7-3no8QtUx2_O2l-/pub?output=csv';
-
+        let allData = [];
         let currentImages = [];
         let currentIndex = 0;
 
@@ -151,63 +172,96 @@
             document.getElementById('modalImage').src = currentImages[currentIndex];
         }
 
+        function renderCards(data) {
+            const container = document.getElementById('card-container');
+            container.innerHTML = '';
+
+            data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+
+                const img = document.createElement('img');
+                img.src = item['Foto 1'] || '';
+                img.alt = 'Foto principale';
+
+                const content = document.createElement('div');
+                content.className = 'card-content';
+
+                const subtitle = document.createElement('h4');
+                subtitle.textContent = item['Sottotitolo'] || '';
+
+                const title = document.createElement('h3');
+                title.textContent = item['Titolo'] || '';
+                const title2 = document.createElement('h3');
+                title2.textContent = item['Edizione'] || '';
+
+                const desc = document.createElement('p');
+                desc.textContent = item['Descrizione'] || '';
+
+                const images = [];
+                ['Foto 2', 'Foto 3', 'Foto 4'].forEach(f => {
+                    if (item[f]) images.push(item[f]);
+                });
+
+                img.addEventListener('click', () => {
+                    openModal(images, 0);
+                });
+
+                content.appendChild(subtitle);
+                content.appendChild(title);
+                content.appendChild(title2);
+                content.appendChild(desc);
+
+                card.appendChild(img);
+                card.appendChild(content);
+                container.appendChild(card);
+            });
+        }
+
+        function createFilterButtons(data) {
+            const container = document.getElementById('filterButtons');
+            const subtitles = [...new Set(data.map(item => item['Sottotitolo']).filter(Boolean))].sort();
+
+            const allBtn = document.createElement('button');
+            allBtn.textContent = 'Tutti';
+            allBtn.classList.add('active');
+            allBtn.addEventListener('click', () => filterBySubtitle(null, allBtn));
+            container.appendChild(allBtn);
+
+            subtitles.forEach(sub => {
+                const btn = document.createElement('button');
+                btn.textContent = sub;
+                btn.addEventListener('click', () => filterBySubtitle(sub, btn));
+                container.appendChild(btn);
+            });
+        }
+
+        function filterBySubtitle(subtitle, clickedButton) {
+            document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
+            clickedButton.classList.add('active');
+
+            if (!subtitle) {
+                renderCards(allData);
+            } else {
+                const filtered = allData.filter(item => item['Sottotitolo'] === subtitle);
+                renderCards(filtered);
+            }
+        }
+
         Papa.parse(csvUrl, {
             download: true,
             header: true,
             complete: function (results) {
-                const data = results.data;
-                const container = document.getElementById('card-container');
-
-                data.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = 'card';
-
-                    const img = document.createElement('img');
-                    img.src = item['Foto 1'] || '';
-                    img.alt = 'Foto principale';
-
-                    const content = document.createElement('div');
-                    content.className = 'card-content';
-
-                    const subtitle = document.createElement('h4');
-                    subtitle.textContent = item['Sottotitolo'] || '';
-
-                    const title = document.createElement('h3');
-                    title.textContent = item['Titolo'] || '';
-                    const title2 = document.createElement('h3');
-                    title2.textContent = item['Edizione'] || '';
-
-                    const desc = document.createElement('p');
-                    desc.textContent = item['Descrizione'] || '';
-
-                    // Raccolta immagini per il carosello
-                    const images = [];
-                    ['Foto 2', 'Foto 3', 'Foto 4'].forEach(f => {
-                        if (item[f]) images.push(item[f]);
-                    });
-
-                    img.addEventListener('click', () => {
-                        openModal(images, 0); // Mostra carosello partendo dalla prima immagine
-                    });
-
-                    content.appendChild(subtitle);
-                    content.appendChild(title);
-                    content.appendChild(title2);
-                    content.appendChild(desc);
-
-                    card.appendChild(img);
-                    card.appendChild(content);
-                    container.appendChild(card);
-                });
+                allData = results.data;
+                renderCards(allData);
+                createFilterButtons(allData);
             }
         });
 
-        // Chiudi modale con ESC
         window.addEventListener('keydown', function (e) {
             if (e.key === 'Escape') closeModal();
         });
     </script>
-
 </body>
 
 </html>
