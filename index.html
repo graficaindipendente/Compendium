@@ -5,6 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Compendium</title>
+    <link rel="shortcut icon" href="/favicon.png" />
+    <link rel="icon" type="image/png" href="/favicon.png" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180" href="/favicon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon.png">
+    <link rel="shortcut icon" href="https://graficaindipendente.com/catalogo/assets/favicon.ico" />
+    <link rel="icon" type="image/png" href="https://graficaindipendente.com/catalogo/assets/favicon-32.png" sizes="32x32">
+    <link rel="apple-touch-icon" sizes="180x180"
+        href="https://graficaindipendente.com/catalogo/assets/favicon-180-precomposed.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://graficaindipendente.com/catalogo/assets/favicon-192.png">
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -27,8 +37,14 @@
         }
 
         .filter-buttons button.active {
-            background-color: #7700ff;
+            background-color: #e53935;
             color: white;
+        }
+
+        .filter-buttons button.csv-link {
+            background-color: #e53935;
+            color: white;
+            font-weight: bold;
         }
 
         .grid {
@@ -132,7 +148,7 @@
 
 <body>
 
-    <!-- ✅ Bottoni filtro dinamici -->
+    <!-- Bottoni filtro dinamici -->
     <div class="filter-buttons" id="filterButtons"></div>
 
     <!-- Contenitore carte -->
@@ -148,9 +164,12 @@
         <span class="next" onclick="changeSlide(1)">&#10095;</span>
     </div>
 
+    <!-- PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRqhkY2nqdQ5OMhYSfOLZWk7YYNiB0v3vJQxuSTL3udiKhrsLhQzgJ2LNkI4RuG7-3no8QtUx2_O2l-/pub?output=csv';
+        const csvSheetUrl = 'https://docs.google.com/spreadsheets/d/1Z0MINyv9PcIjyAg9ErzZpzQxlfLKCc_1Dgjn7-huDD4/edit?gid=0#gid=0';
+
         let allData = [];
         let currentImages = [];
         let currentIndex = 0;
@@ -220,7 +239,7 @@
 
         function createFilterButtons(data) {
             const container = document.getElementById('filterButtons');
-            const subtitles = [...new Set(data.map(item => item['Sottotitolo']).filter(Boolean))].sort();
+            const subtitles = [...new Set(data.map(item => item['Keyword']).filter(Boolean))].sort();
 
             const allBtn = document.createElement('button');
             allBtn.textContent = 'Tutti';
@@ -234,6 +253,13 @@
                 btn.addEventListener('click', () => filterBySubtitle(sub, btn));
                 container.appendChild(btn);
             });
+
+            // Bottone rosso CSV
+            const csvBtn = document.createElement('button');
+            csvBtn.textContent = 'CSV';
+            csvBtn.className = 'csv-link';
+            csvBtn.onclick = () => window.open(csvSheetUrl, '_blank');
+            container.appendChild(csvBtn);
         }
 
         function filterBySubtitle(subtitle, clickedButton) {
@@ -243,7 +269,7 @@
             if (!subtitle) {
                 renderCards(allData);
             } else {
-                const filtered = allData.filter(item => item['Sottotitolo'] === subtitle);
+                const filtered = allData.filter(item => item['Keyword'] === subtitle);
                 renderCards(filtered);
             }
         }
@@ -253,6 +279,14 @@
             header: true,
             complete: function (results) {
                 allData = results.data;
+
+                // Ordina alfabeticamente per Titolo
+                allData.sort((a, b) => {
+                    const titleA = (a['Titolo'] || '').toLowerCase();
+                    const titleB = (b['Titolo'] || '').toLowerCase();
+                    return titleA.localeCompare(titleB);
+                });
+
                 renderCards(allData);
                 createFilterButtons(allData);
             }
