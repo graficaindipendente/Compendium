@@ -3,19 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Compendium</title>
     <link rel="shortcut icon" href="assets/favicon.ico" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
-    <link rel="apple-touch-icon" sizes="57x57" href="assets/apple-touch-icon-57x57.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="assets/apple-touch-icon-72x72.png" />
-    <link rel="apple-touch-icon" sizes="76x76" href="assets/apple-touch-icon-76x76.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="assets/apple-touch-icon-114x114.png" />
-    <link rel="apple-touch-icon" sizes="120x120" href="assets/apple-touch-icon-120x120.png" />
-    <link rel="apple-touch-icon" sizes="144x144" href="assets/apple-touch-icon-144x144.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="assets/apple-touch-icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon-180x180.png"/>
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,10 +15,13 @@
 
         .filter-buttons {
             margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
         }
 
         .filter-buttons button {
-            margin: 5px 5px 5px 0;
             padding: 8px 12px;
             font-size: 14px;
             border: none;
@@ -46,6 +39,13 @@
             background-color: #e53935;
             color: white;
             font-weight: bold;
+        }
+
+        .filter-buttons input[type="text"] {
+            padding: 8px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
         }
 
         .grid {
@@ -93,103 +93,126 @@
         }
 
         .modal {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            align-items: center;
-            justify-content: center;
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 700px;
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+    margin-bottom: 40px; /* Spazio extra in fondo per scorrere */
+}
+
+        .modal-content h2 {
+            margin-top: 0;
         }
 
-        .modal-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-        }
-
-        .modal-content img {
-            max-width: 80%;
-            max-height: 80%;
+        .modal-content .foto1 {
+            width: 50%;
+            height: auto;
+            object-fit: contain;
             display: block;
-            margin: auto;
+            margin: 20px auto;
+            cursor: default;
         }
 
-        .close,
-        .prev,
-        .next {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            color: white;
-            font-size: 2em;
-            cursor: pointer;
-            user-select: none;
+        .vertical-thumbs {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .vertical-thumbs img.foto234 {
+            width: 80%;
+            height: auto;
+            object-fit: contain;
+            cursor: default;
         }
 
         .close {
-            top: 20px;
-            right: 30px;
+            position: absolute;
+            top: 10px;
+            right: 20px;
             font-size: 2em;
-            transform: none;
+            cursor: pointer;
+            color: #333;
         }
 
-        .prev {
-            left: 10px;
-        }
-
-        .next {
-            right: 10px;
+        iframe {
+            width: 100%;
+            height: 315px;
+            margin-top: 15px;
         }
     </style>
 </head>
 
 <body>
-  <h2>  <img src="assets/apple-touch-icon-57x57.png" alt=""> Compendium <div class="filter-buttons" id="filterButtons"></div></h2>
+    <h2>
+        <img src="assets/apple-touch-icon-57x57.png" alt=""> Compendium
+        <div class="filter-buttons" id="filterButtons"></div>
+    </h2>
 
-
-
-    <!-- Contenitore carte -->
     <div class="grid" id="card-container"></div>
 
-    <!-- Modale immagini -->
+    <!-- Modale dettagli -->
     <div class="modal" id="imageModal">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <span class="prev" onclick="changeSlide(-1)">&#10094;</span>
-        <div class="modal-content">
-            <img id="modalImage" src="" alt="">
+        <div class="modal-content" id="modalContent">
+            <span class="close" onclick="closeModal()">&times;</span>
         </div>
-        <span class="next" onclick="changeSlide(1)">&#10095;</span>
     </div>
 
-    <!-- PapaParse -->
     <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
     <script>
         const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRqhkY2nqdQ5OMhYSfOLZWk7YYNiB0v3vJQxuSTL3udiKhrsLhQzgJ2LNkI4RuG7-3no8QtUx2_O2l-/pub?output=csv';
         const csvSheetUrl = 'https://docs.google.com/spreadsheets/d/1Z0MINyv9PcIjyAg9ErzZpzQxlfLKCc_1Dgjn7-huDD4/edit?gid=0#gid=0';
 
         let allData = [];
-        let currentImages = [];
-        let currentIndex = 0;
-
-        function openModal(images, index) {
-            currentImages = images;
-            currentIndex = index;
-            document.getElementById('modalImage').src = currentImages[currentIndex];
-            document.getElementById('imageModal').style.display = 'flex';
-        }
 
         function closeModal() {
             document.getElementById('imageModal').style.display = 'none';
         }
 
-        function changeSlide(direction) {
-            if (currentImages.length === 0) return;
-            currentIndex = (currentIndex + direction + currentImages.length) % currentImages.length;
-            document.getElementById('modalImage').src = currentImages[currentIndex];
+        function openModalWithDetails(item) {
+            const modal = document.getElementById('imageModal');
+            const content = document.getElementById('modalContent');
+
+            content.innerHTML = `
+                <span class="close" onclick="closeModal()">&times;</span>
+ ${item['Foto 1'] ? `<img src="${item['Foto 1']}" class="foto1">` : ''}
+                <h2>${item['Titolo'] || ''}</h2>
+                <h4>${item['Sottotitolo'] || ''}</h4>
+                <h4>${item['Edizione'] || ''}</h4>
+                <p>${item['Descrizione'] || ''}</p>
+                ${item['URL'] ? `<p><a href="${item['URL']}" target="_blank">Vai al sito</a></p>` : ''}
+                ${item['Video'] ? `<iframe src="${item['Video']}" frameborder="0" allowfullscreen></iframe>` : ''}
+               
+                <div class="vertical-thumbs">
+                    ${['Foto 2', 'Foto 3', 'Foto 4']
+                    .map(f => item[f] ? `<img src="${item[f]}" class="foto234">` : '')
+                    .join('')}
+                </div>
+            `;
+
+            modal.style.display = 'flex';
         }
 
         function renderCards(data) {
@@ -212,24 +235,17 @@
 
                 const title = document.createElement('h3');
                 title.textContent = item['Titolo'] || '';
-                const title2 = document.createElement('h3');
-                title2.textContent = item['Edizione'] || '';
+                const edition = document.createElement('h3');
+                edition.textContent = item['Edizione'] || '';
 
                 const desc = document.createElement('p');
                 desc.textContent = item['Descrizione'] || '';
 
-                const images = [];
-                ['Foto 2', 'Foto 3', 'Foto 4'].forEach(f => {
-                    if (item[f]) images.push(item[f]);
-                });
-
-                img.addEventListener('click', () => {
-                    openModal(images, 0);
-                });
+                img.addEventListener('click', () => openModalWithDetails(item));
 
                 content.appendChild(subtitle);
                 content.appendChild(title);
-                content.appendChild(title2);
+                content.appendChild(edition);
                 content.appendChild(desc);
 
                 card.appendChild(img);
@@ -255,12 +271,21 @@
                 container.appendChild(btn);
             });
 
-            // Bottone rosso CSV
             const csvBtn = document.createElement('button');
             csvBtn.textContent = 'CSV';
             csvBtn.className = 'csv-link';
             csvBtn.onclick = () => window.open(csvSheetUrl, '_blank');
             container.appendChild(csvBtn);
+
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.placeholder = 'Cerca per titolo...';
+            searchInput.addEventListener('input', () => {
+                const query = searchInput.value.toLowerCase();
+                const filtered = allData.filter(item => (item['Titolo'] || '').toLowerCase().includes(query));
+                renderCards(filtered);
+            });
+            container.appendChild(searchInput);
         }
 
         function filterBySubtitle(subtitle, clickedButton) {
@@ -280,8 +305,6 @@
             header: true,
             complete: function (results) {
                 allData = results.data;
-
-                // Ordina alfabeticamente per Titolo
                 allData.sort((a, b) => {
                     const titleA = (a['Titolo'] || '').toLowerCase();
                     const titleB = (b['Titolo'] || '').toLowerCase();
