@@ -91,7 +91,7 @@
             font-size: 0.7em;
             color: #313131;
             display: -webkit-box;
-            -webkit-line-clamp: 3;
+            -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -267,11 +267,11 @@
             container.appendChild(allBtn);
 
             const newBtn = document.createElement('button');
-            newBtn.textContent = 'NEW';
+            newBtn.textContent = 'Novità';
             newBtn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
                 newBtn.classList.add('active');
-                const latest = allData.slice(-10);
+                const latest = allData.slice(-12);
                 renderCards(latest);
             });
             container.appendChild(newBtn);
