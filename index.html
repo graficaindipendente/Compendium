@@ -68,6 +68,7 @@
             height: 150px;
             object-fit: cover;
             cursor: pointer;
+            border-radius: 8px;
         }
 
         .card-content {
@@ -79,10 +80,26 @@
             margin: 0;
             font-size: 1.2em;
         }
+        h1 {
+            font-size: 1.8em;
+            margin: 0 15px 0;
+            color: #1b1b1b;
+        }
+        h3 {
+            font-size: 1.2em;
+            margin: 0;
+            color: #1b1b1b;
+        }
 
         .card h4 {
             font-size: 0.6em;
             margin: 5px 0;
+            color: #666;
+        }
+        
+        h4 {
+            font-size: 0.6em;
+            margin: 5px 30px;
             color: #666;
         }
 
@@ -136,6 +153,7 @@
             display: block;
             margin: 20px auto;
             cursor: default;
+            border-radius: 16px;
         }
 
         .vertical-thumbs {
@@ -151,6 +169,8 @@
             height: auto;
             object-fit: contain;
             cursor: default;
+                        border-radius: 8px;
+
         }
 
         .close {
@@ -199,9 +219,9 @@
             content.innerHTML = `
                 <span class="close" onclick="closeModal()">&times;</span>
                 ${item['Foto 1'] ? `<img src="${item['Foto 1']}" class="foto1">` : ''}
-                <h2>${item['Titolo'] || ''}</h2>
-                <h4>${item['Sottotitolo'] || ''}</h4>
-                <h4>${item['Edizione'] || ''}</h4>
+ <h4>${item['Sottotitolo'] || ''}</h4>
+                <h1>${item['Titolo'] || ''}</h1>
+                <h1>${item['Edizione'] || ''}</h1>
                 <p>${item['Descrizione'] || ''}</p>
                 ${item['URL'] ? `<p><a href="${item['URL']}" target="_blank">Vai al sito</a></p>` : ''}
                 ${item['Video'] ? `<iframe src="${item['Video']}" frameborder="0" allowfullscreen></iframe>` : ''}
@@ -216,7 +236,7 @@
             const container = document.getElementById('card-container');
             container.innerHTML = '';
 
-            data.forEach(item => {
+            [...data].reverse().forEach(item => {
                 const card = document.createElement('div');
                 card.className = 'card';
 
@@ -262,19 +282,19 @@
             allBtn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
                 allBtn.classList.add('active');
-                renderCards(allData);
+          renderCards(allData);
             });
             container.appendChild(allBtn);
 
-            const newBtn = document.createElement('button');
+/*             const newBtn = document.createElement('button');
             newBtn.textContent = 'Novità';
             newBtn.addEventListener('click', () => {
                 document.querySelectorAll('.filter-buttons button').forEach(btn => btn.classList.remove('active'));
                 newBtn.classList.add('active');
-                const latest = allData.slice(-12);
+                const latest = [...allData].reverse().slice(0, 21);
                 renderCards(latest);
             });
-            container.appendChild(newBtn);
+            container.appendChild(newBtn); */
 
             subtitles.forEach(sub => {
                 const btn = document.createElement('button');
@@ -327,11 +347,11 @@
         });
     </script>
 
-<div class="modal" id="imageModal">
-    <div class="modal-content" id="modalContent">
-        <span class="close" onclick="closeModal()">&times;</span>
+    <div class="modal" id="imageModal">
+        <div class="modal-content" id="modalContent">
+            <span class="close" onclick="closeModal()">&times;</span>
+        </div>
     </div>
-</div>
 </body>
 
 </html>
